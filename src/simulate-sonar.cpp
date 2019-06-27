@@ -10,7 +10,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <iomanip>
-
+#include <csignal>
 
 /* 
  * File:   simulate-sonar.hpp
@@ -19,42 +19,53 @@
  * Created on June 26, 2019, 2:41 PM
  */
 
-class simulateSonar
+class SonarSimulator
 {
     public:
-        simulateSonar(double pFrequence, double pPattern, std::string pFilename)
+        
+        SonarSimulator()
         {
-            frequence = pFrequence;
-            pattern = pPattern;
-            filename = pFilename;
+            frequence = 0;
+            pattern = 0;
+            filename = "";
         }
         
-        ~simulateSonar()
+        SonarSimulator(double frequenceSecond, double patternFix, std::string fileName)
+        {
+            frequence = frequenceSecond;
+            pattern = patternFix;
+            filename = fileName;
+        }
+        
+        ~SonarSimulator()
         {}
         
-        void makeSignal()
+        void setFrequence(double frequenceSecond)
         {
-            std::stringstream nmeaList;
-            std::ofstream out;
+            frequence = frequenceSecond;
+        }
+        
+        void setPattern(double patternFix)
+        {
+            pattern = patternFix;
+        }
+        
+        void setFilename(std::string fileName)
+        {
+            filename = fileName;
+        }
+        
+        void run()
+        {
+            out = std::ofstream(filename);
             while(1)
             {
                 sleep(frequence);
-                out = std::ofstream(filename);
                 double depth = 3.75;
-                nmeaList << generateNMEA(depth);
                 std::cout << generateNMEA(depth);
-                out << nmeaList.str();
-                out.close();
+                out << generateNMEA(depth);
             }
         }
-        
-    private:
-        
-        double frequence;
-        
-        double pattern;
-        
-        std::string filename;
         
         std::string generateNMEA(double depth)
         {
@@ -71,6 +82,22 @@ class simulateSonar
             nmea << std::hex << checksum << "\x0d\x0a";
             return nmea.str();
         }
+        
+        void closeFile()
+        {
+            out.close();
+        }
+        
+    private:
+        
+        double frequence;
+        
+        double pattern;
+        
+        std::string filename;
+        
+        std::ofstream out;
+        
 };
 
 void printUsage()
@@ -79,13 +106,24 @@ void printUsage()
 	exit(1);
 }
 
+SonarSimulator simul;
+
+void closeProgram(int signum)
+{
+    simul.closeFile();
+    exit(1);
+}
+
 int main(int argc,char **argv)
 {
     if (argc >= 2)
     {
         std::string filename = argv[1];
-        simulateSonar simul(3,10,filename);
-        simul.makeSignal();
+        simul.setFrequence(3);
+        simul.setPattern(10);
+        simul.setFilename(filename);
+        signal(SIGINT,closeProgram);
+        simul.run();
     }
     else
     {
