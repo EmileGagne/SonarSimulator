@@ -34,16 +34,17 @@ class simulateSonar
         
         void makeSignal()
         {
-            std::stringstream nmea;
-            std::ofstream out = std::ofstream(filename);
+            std::stringstream nmeaList;
+            std::ofstream out;
             while(1)
             {
-                nmea.str("");
                 sleep(frequence);
+                out = std::ofstream(filename);
                 double depth = 3.75;
-                nmea << generateNMEA(depth);
-                std::cout << nmea.str();
-                out << nmea.str() << std::endl;
+                nmeaList << generateNMEA(depth);
+                std::cout << generateNMEA(depth);
+                out << nmeaList.str();
+                out.close();
             }
         }
         
