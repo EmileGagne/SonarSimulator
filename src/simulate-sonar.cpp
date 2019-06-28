@@ -33,7 +33,10 @@ class SonarSimulator
         filename(filename)
         {}
         
-        SonarSimulator(std::string talkerID):
+        SonarSimulator(int frequenceHertz, double pattern, std::string filename, std::string talkerID):
+        frequence(frequenceHertz),
+        pattern(pattern),
+        filename(filename),
         talkerID(talkerID)
         {}
         
