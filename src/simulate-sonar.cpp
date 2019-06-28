@@ -116,9 +116,9 @@ void closeProgram(int signum)
 
 int main(int argc,char **argv)
 {
+    signal(SIGINT,closeProgram);
     if (argc == 2)
-    {
-        signal(SIGINT,closeProgram);
+    {    
         std::string filename = argv[1];
         simulator.setFrequence(3);
         simulator.setPattern(10);
