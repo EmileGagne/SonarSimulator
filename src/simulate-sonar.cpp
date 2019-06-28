@@ -21,19 +21,7 @@ class SonarSimulator
 {
     public:
         
-        SonarSimulator():
-        frequence(0),
-        pattern(0),
-        filename("")
-        {}
-        
-        SonarSimulator(int frequenceHertz, double pattern, std::string filename):
-        frequence(frequenceHertz),
-        pattern(pattern),
-        filename(filename)
-        {}
-        
-        SonarSimulator(int frequenceHertz, double pattern, std::string filename, std::string talkerID):
+        SonarSimulator(double frequenceHertz, double pattern, std::string filename, std::string talkerID = "SD"):
         frequence(frequenceHertz),
         pattern(pattern),
         filename(filename),
@@ -43,7 +31,7 @@ class SonarSimulator
         ~SonarSimulator()
         {}
         
-        void setFrequence(int frequenceHertz)
+        void setFrequence(double frequenceHertz)
         {
             frequence = frequenceHertz;
         }
@@ -63,18 +51,11 @@ class SonarSimulator
             out = std::ofstream(filename);
             if (frequence > 0)
             {
-                int i = 0;
                 while(1)
                 {
-                    if (i == frequence)
-                    {
-                       sleep(1); 
-                       i = 0;
-                    }
+                    usleep(1000000/frequence); 
                     double depth = 3.75;
-                    std::cout << generateNMEA(depth);
                     out << generateNMEA(depth);
-                    i = i+1;
                 }
             }
             else
@@ -115,7 +96,7 @@ class SonarSimulator
         
         std::ofstream out;
         
-        std::string talkerID = "SD";
+        std::string talkerID;
         
 };
 
@@ -125,11 +106,11 @@ void printUsage()
 	exit(1);
 }
 
-SonarSimulator simulator;
+SonarSimulator *simulator;
 
 void closeProgram(int signum)
 {
-    simulator.closeFile();
+    simulator->closeFile();
     exit(1);
 }
 
@@ -139,10 +120,8 @@ int main(int argc,char **argv)
     if (argc == 2)
     {    
         std::string filename = argv[1];
-        simulator.setFrequence(3);
-        simulator.setPattern(10);
-        simulator.setFilename(filename);
-        simulator.run();
+        simulator = new SonarSimulator(0.5,10,filename);
+        simulator->run();
     }
     else
     {
