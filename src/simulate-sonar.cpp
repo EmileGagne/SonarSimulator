@@ -106,24 +106,24 @@ void printUsage()
 	exit(1);
 }
 
-SonarSimulator simul;
+SonarSimulator simulator;
 
 void closeProgram(int signum)
 {
-    simul.closeFile();
+    simulator.closeFile();
     exit(1);
 }
 
 int main(int argc,char **argv)
 {
-    if (argc >= 2)
+    if (argc == 2)
     {
-        std::string filename = argv[1];
-        simul.setFrequence(3);
-        simul.setPattern(10);
-        simul.setFilename(filename);
         signal(SIGINT,closeProgram);
-        simul.run();
+        std::string filename = argv[1];
+        simulator.setFrequence(3);
+        simulator.setPattern(10);
+        simulator.setFilename(filename);
+        simulator.run();
     }
     else
     {
