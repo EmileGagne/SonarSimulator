@@ -1,8 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
 #include <string>
 #include <sstream>
@@ -23,26 +21,28 @@ class SonarSimulator
 {
     public:
         
-        SonarSimulator()
-        {
-            frequence = 0;
-            pattern = 0;
-            filename = "";
-        }
+        SonarSimulator():
+        frequence(0),
+        pattern(0),
+        filename("")
+        {}
         
-        SonarSimulator(double frequenceSecond, double patternFix, std::string fileName)
-        {
-            frequence = frequenceSecond;
-            pattern = patternFix;
-            filename = fileName;
-        }
+        SonarSimulator(int frequenceHertz, double pattern, std::string filename):
+        frequence(frequenceHertz),
+        pattern(pattern),
+        filename(filename)
+        {}
+        
+        SonarSimulator(std::string talkerID):
+        talkerID(talkerID)
+        {}
         
         ~SonarSimulator()
         {}
         
-        void setFrequence(double frequenceSecond)
+        void setFrequence(int frequenceHertz)
         {
-            frequence = frequenceSecond;
+            frequence = frequenceHertz;
         }
         
         void setPattern(double patternFix)
@@ -58,12 +58,26 @@ class SonarSimulator
         void run()
         {
             out = std::ofstream(filename);
-            while(1)
+            if (frequence > 0)
             {
-                sleep(frequence);
-                double depth = 3.75;
-                std::cout << generateNMEA(depth);
-                out << generateNMEA(depth);
+                int i = 0;
+                while(1)
+                {
+                    if (i == frequence)
+                    {
+                       sleep(1); 
+                       i = 0;
+                    }
+                    double depth = 3.75;
+                    std::cout << generateNMEA(depth);
+                    out << generateNMEA(depth);
+                    i = i+1;
+                }
+            }
+            else
+            {
+                out.close();
+                exit(1);
             }
         }
         
@@ -73,7 +87,7 @@ class SonarSimulator
             double ftDepth = depth*3.28084;
             double fmDepth = ftDepth/6;
             nmea << std::setprecision(1) << std::fixed;
-            nmea << "$SDDBT," << ftDepth << ",f," << depth << ",M," << fmDepth << ",F" << "*";
+            nmea << "$" << talkerID << "DBT," << ftDepth << ",f," << depth << ",M," << fmDepth << ",F" << "*";
             int checksum = 0;
             for (int i = 1; i < (int)nmea.str().length()-1; i++)
             {
@@ -97,6 +111,8 @@ class SonarSimulator
         std::string filename;
         
         std::ofstream out;
+        
+        std::string talkerID = "SD";
         
 };
 
