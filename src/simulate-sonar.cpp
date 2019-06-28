@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <iomanip>
 #include <csignal>
+#include <exception>
 
 /* 
  * File:   simulate-sonar.hpp
@@ -24,7 +25,7 @@ class SonarSimulator
         SonarSimulator(double frequenceHertz, double pattern, std::string & filename, std::string talkerID = "SD"):
         frequenceHertz(frequenceHertz),
         depthPattern(pattern),
-        outputFilename(filename),
+        outputFileName(filename),
         talkerID(talkerID)
         {}
         
@@ -61,7 +62,7 @@ class SonarSimulator
 			}
 		}
 		else{
-			throw new std::exception("Output file not found");
+			throw new std::invalid_argument("Output file not found");
 		}
             }
             else
@@ -97,7 +98,7 @@ class SonarSimulator
         
         double depthPattern;
         
-        std::string outputFilename;
+        std::string outputFileName;
         
         std::ofstream outputFile;
         
