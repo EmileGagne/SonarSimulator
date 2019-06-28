@@ -48,20 +48,25 @@ class SonarSimulator
         
         void run()
         {
-            outputFile = std::ofstream(outputFileName);
             if (frequenceHertz > 0)
             {
-                while(1)
-                {
-                    usleep(1000000/frequenceHertz); 
-                    double depth = 3.75;
-                    outputFile << generateNMEA(depth);
-                }
+	        outputFile.open(outputFileName);
+		
+		if(outputFile){
+			while(1)
+			{
+			    usleep(1000000/frequenceHertz); 
+			    double depth = 3.75;
+			    outputFile << generateNMEA(depth);
+			}
+		}
+		else{
+			throw new std::exception("Output file not found");
+		}
             }
             else
             {
-                outputFile.close();
-                exit(1);
+		throw new std::out_of_range("Frequency cannot be negative");
             }
         }
         
