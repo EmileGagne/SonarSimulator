@@ -22,9 +22,9 @@ class SonarSimulator
     public:
         
         SonarSimulator(double frequenceHertz, double pattern, std::string & filename, std::string talkerID = "SD"):
-        frequence(frequenceHertz),
-        pattern(pattern),
-        filename(filename),
+        frequenceHertz(frequenceHertz),
+        depthPattern(pattern),
+        outputFilename(filename),
         talkerID(talkerID)
         {}
         
