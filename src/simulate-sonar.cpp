@@ -21,7 +21,7 @@ class SonarSimulator
 {
     public:
         
-        SonarSimulator(double frequenceHertz, double pattern, std::string filename, std::string talkerID = "SD"):
+        SonarSimulator(double frequenceHertz, double pattern, std::string & filename, std::string talkerID = "SD"):
         frequence(frequenceHertz),
         pattern(pattern),
         filename(filename),
@@ -33,34 +33,34 @@ class SonarSimulator
         
         void setFrequence(double frequenceHertz)
         {
-            frequence = frequenceHertz;
+            frequenceHertz = frequenceHertz;
         }
         
-        void setPattern(double patternFix)
+        void setDepthPattern(double pattern)
         {
-            pattern = patternFix;
+            depthPattern = pattern;
         }
         
-        void setFilename(std::string fileName)
+        void setOutputFilename(std::string & fileName)
         {
-            filename = fileName;
+            outputFileName = fileName;
         }
         
         void run()
         {
-            out = std::ofstream(filename);
-            if (frequence > 0)
+            outputFile = std::ofstream(outputFileName);
+            if (frequenceHertz > 0)
             {
                 while(1)
                 {
-                    usleep(1000000/frequence); 
+                    usleep(1000000/frequenceHertz); 
                     double depth = 3.75;
-                    out << generateNMEA(depth);
+                    outputFile << generateNMEA(depth);
                 }
             }
             else
             {
-                out.close();
+                outputFile.close();
                 exit(1);
             }
         }
@@ -83,18 +83,18 @@ class SonarSimulator
         
         void closeFile()
         {
-            out.close();
+            outputFile.close();
         }
         
     private:
         
-        double frequence;
+        double frequenceHertz;
         
-        double pattern;
+        double depthPattern;
         
-        std::string filename;
+        std::string outputFilename;
         
-        std::ofstream out;
+        std::ofstream outputFile;
         
         std::string talkerID;
         
