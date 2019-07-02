@@ -109,4 +109,43 @@ TEST_CASE("test with a null frequence")
     REQUIRE(msgError == "Out of range: Frequency cannot be negative or null");
 }
 
-TEST_CASE()
+TEST_CASE("test the Sonar Simulator command with wrong parameter")
+{
+    string commFile = " 2>&1";
+    std::stringstream ss;
+    ss = system_call(std::string(binexec+commFile));
+    REQUIRE(ss.str()=="Usage: simulate-sonar outputFileName\n");
+}
+
+TEST_CASE("test the checksum calculation")
+{
+    std::string line = "$GPGGA,151748.00,4645.5364455,N,07255.2973044,W,2,14,0.8,278.587,M,-31.492,M,5.0,0133*";
+    SonarSimulator *simulator;
+    std::string filename = "test";
+    simulator = new SonarSimulator(1,1,filename);
+    int checksum = simulator->calculChecksum(line);
+    std::stringstream ss;
+    ss<<std::hex<<checksum;
+    REQUIRE(ss.str() == "7a");
+}
+
+TEST_CASE("test the Sonar Simulator NMEA line")
+{
+    SonarSimulator *simulator;
+    std::string filename = "outTest";
+    std::string talkerID = "SD";
+    simulator = new SonarSimulator(1,1,filename,talkerID);
+    std::string result;
+    result = simulator->generateNMEA(3.75);
+    char ID[3];
+    double depthFeet;
+    double depthMeter;
+    double depthFathoms;
+    char checksum[3];
+    REQUIRE(sscanf(result.c_str(),"$%2sDBT,%lf,f,%lf,M,%lf,F*%2s\x0d\x0a",ID,&depthFeet,&depthMeter,&depthFathoms,checksum)==5);
+    REQUIRE(std::string(ID)==talkerID);
+    REQUIRE(abs(depthFeet-12.3)<1e-10);
+    REQUIRE(abs(depthMeter-3.7)<1e-10);
+    REQUIRE(abs(depthFathoms-2.0)<1e-10);
+    REQUIRE(std::string(checksum)=="2f");
+}
