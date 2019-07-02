@@ -13,6 +13,7 @@
 
 #include "catch.hpp"
 #include "../src/SonarSimulator.hpp"
+#include <exception>
 
 using namespace std;
 #ifdef _WIN32
@@ -57,7 +58,55 @@ std::stringstream system_call(const std::string& command){
      return out;
 }
 
-TEST_CASE("test ...")
+TEST_CASE("test with no output file")
 {
-    SonarSimulator *s;
+    SonarSimulator *simulator;
+    std:string empty = "";
+    simulator = new SonarSimulator(1,1,empty);
+    std::string msgError = "";
+    try
+    {
+        simulator->run();
+    }
+    catch(Exception * e)
+    {
+        msgError = e->getMessage();
+    }
+    REQUIRE(msgError == "Invalid argument: Output file not found");
 }
+
+TEST_CASE("test with a negative frequence")
+{
+    SonarSimulator *simulator;
+    std::string filename = "ayudy";
+    simulator = new SonarSimulator(-1,1,filename);
+    std::string msgError = "";
+    try
+    {
+        simulator->run();
+    }
+    catch(Exception * e)
+    {
+        msgError = e->getMessage();
+    }
+    REQUIRE(msgError == "Out of range: Frequency cannot be negative or null");
+}
+
+TEST_CASE("test with a null frequence")
+{
+    SonarSimulator *simulator;
+    std::string filename = "hdohef";
+    simulator = new SonarSimulator(0,1,filename);
+    std::string msgError = "";
+    try
+    {
+        simulator->run();
+    }
+    catch(Exception * e)
+    {
+        msgError = e->getMessage();
+    }
+    REQUIRE(msgError == "Out of range: Frequency cannot be negative or null");
+}
+
+TEST_CASE()

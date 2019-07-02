@@ -10,6 +10,8 @@
 #include <iomanip>
 #include <csignal>
 #include <exception>
+#include <math.h>
+#include "Exception.hpp"
 
 /* 
  * File:   SonarSimulator.hpp
@@ -62,12 +64,12 @@ class SonarSimulator
 			}
 		}
 		else{
-			throw new std::invalid_argument("Output file not found");
+                        throw new Exception("Invalid argument: Output file not found");
 		}
             }
             else
             {
-		throw new std::out_of_range("Frequency cannot be negative");
+                throw new Exception ("Out of range: Frequency cannot be negative or null");
             }
         }
         
