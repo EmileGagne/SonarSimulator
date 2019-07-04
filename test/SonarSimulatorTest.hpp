@@ -13,7 +13,14 @@
 
 #include "catch.hpp"
 #include "../src/SonarSimulator.hpp"
+#include <time.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <ctime>
+#include <chrono>
 #include <exception>
+#include <ratio>
+#include <iostream>
 
 using namespace std;
 #ifdef _WIN32
@@ -155,7 +162,6 @@ TEST_CASE("test the writing on the outputFile")
     SonarSimulator *simulator;
     std::string filename = "outTest";
     simulator = new SonarSimulator(1,1,filename);
-    std::string result;
     simulator->openFile();
     simulator->writeLine();
     simulator->closeFile();
@@ -169,4 +175,32 @@ TEST_CASE("test the writing on the outputFile")
     double depthFathoms;
     char checksum[3];
     REQUIRE(sscanf(row.c_str(),"$%2sDBT,%lf,f,%lf,M,%lf,F*%2s\x0d\x0a",ID,&depthFeet,&depthMeter,&depthFathoms,checksum)==5);
+}
+
+TEST_CASE("test the frequence")
+{
+    SonarSimulator *simulator;
+    std::string filename = "outTest";
+    simulator = new SonarSimulator(16,1,filename);
+    simulator->openFile();
+    double time = 0;
+    timeval start;
+    timeval stop;
+    while(time < 1)
+    {
+        gettimeofday(&start,NULL);
+        simulator->writeLine();
+        gettimeofday(&stop,NULL);
+        time = time+ (double) ((stop.tv_sec*1000000+stop.tv_usec)-(start.tv_sec*1000000+start.tv_usec))/1000000.0;
+    }
+    simulator->closeFile();
+    std::ifstream inFile("outTest");
+    REQUIRE(inFile);
+    std::string row;
+    int rowCount = 0;
+    while(std::getline(inFile,row))
+    {
+        rowCount = rowCount+1;
+    }
+    REQUIRE(rowCount==16);
 }
