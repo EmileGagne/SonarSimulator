@@ -149,3 +149,24 @@ TEST_CASE("test the Sonar Simulator NMEA line")
     REQUIRE(abs(depthFathoms-2.0)<1e-10);
     REQUIRE(std::string(checksum)=="2f");
 }
+
+TEST_CASE("test the writing on the outputFile")
+{
+    SonarSimulator *simulator;
+    std::string filename = "outTest";
+    simulator = new SonarSimulator(1,1,filename);
+    std::string result;
+    simulator->openFile();
+    simulator->writeLine();
+    simulator->closeFile();
+    std::ifstream inFile("outTest");
+    REQUIRE(inFile);
+    std::string row;
+    REQUIRE(std::getline(inFile,row));
+    char ID[3];
+    double depthFeet;
+    double depthMeter;
+    double depthFathoms;
+    char checksum[3];
+    REQUIRE(sscanf(row.c_str(),"$%2sDBT,%lf,f,%lf,M,%lf,F*%2s\x0d\x0a",ID,&depthFeet,&depthMeter,&depthFathoms,checksum)==5);
+}
