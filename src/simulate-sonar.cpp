@@ -19,6 +19,7 @@
  * Created on June 26, 2019, 2:41 PM
  */
 
+/**Show how to use the simulate-sonar command*/
 void printUsage()
 {
     std::cerr << "Usage: simulate-sonar outputFileName" << std::endl;
@@ -27,12 +28,23 @@ void printUsage()
 
 SonarSimulator *simulator;
 
+/**
+ * if the user force to stop the command, close the output file
+ * 
+ * @param signum signal ID
+ */
 void closeProgram(int signum)
 {
     simulator->closeFile();
     exit(1);
 }
 
+/**
+ * run the SonarSimulator and print the information on the outputFile receive in argument
+ * 
+ * @param argc number of arguments
+ * @param argv arguments value
+ */
 int main(int argc,char **argv)
 {
     signal(SIGINT,closeProgram);
