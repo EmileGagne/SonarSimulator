@@ -134,7 +134,8 @@ class SonarSimulator
             depth = trunc(depth*10)/10;
             nmea << std::setprecision(1) << std::fixed;
             nmea << "$" << talkerID << "DBT," << ftDepth << ",f," << depth << ",M," << fmDepth << ",F" << "*";
-            int checksum = calculChecksum(nmea.str());
+            std::string nmeaPart = nmea.str();
+            int checksum = calculDBTChecksum(nmeaPart);
             nmea << std::hex << checksum << "\x0d\x0a";
             return nmea.str();
         }
@@ -155,14 +156,25 @@ class SonarSimulator
          * 
          * @param nmea first part of nmea line
          */
-        int calculChecksum(std::string nmea)
+        int calculDBTChecksum(std::string &nmea)
         {
             int checksum = 0;
-            for (int i = 1; i < (int)nmea.length()-1; i++)
+            char ID[3];
+            double depthFeet;
+            double depthMeter;
+            double depthFathoms;
+            if(sscanf(nmea.c_str(),"$%2sDBT,%lf,f,%lf,M,%lf,F*",ID,&depthFeet,&depthMeter,&depthFathoms)==4)
             {
-                checksum ^= nmea.c_str()[i];
+               for (int i = 1; i < (int)nmea.length()-1; i++)
+                {
+                    checksum ^= nmea.c_str()[i];
+                }
+                return checksum; 
             }
-            return checksum;
+            else
+            {
+                throw new Exception ("Invalid parameter: Bad NMEA line");
+            }
         }
         
     private:
