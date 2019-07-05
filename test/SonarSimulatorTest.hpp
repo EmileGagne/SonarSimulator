@@ -65,6 +65,7 @@ std::stringstream system_call(const std::string& command){
      return out;
 }
 
+/**test the running of the Sonar Simulator without output filename*/
 TEST_CASE("test with no output file")
 {
     SonarSimulator *simulator;
@@ -82,6 +83,7 @@ TEST_CASE("test with no output file")
     REQUIRE(msgError == "Invalid argument: Output file not found");
 }
 
+/**test the running of the Sonar Simulator with a negative frequence*/
 TEST_CASE("test with a negative frequence")
 {
     SonarSimulator *simulator;
@@ -99,6 +101,7 @@ TEST_CASE("test with a negative frequence")
     REQUIRE(msgError == "Out of range: Frequency cannot be negative or null");
 }
 
+/**test the running of the Sonar Simulator with a null frequence*/
 TEST_CASE("test with a null frequence")
 {
     SonarSimulator *simulator;
@@ -116,6 +119,7 @@ TEST_CASE("test with a null frequence")
     REQUIRE(msgError == "Out of range: Frequency cannot be negative or null");
 }
 
+/**test to execute the simulate-sonar without parameter*/
 TEST_CASE("test the Sonar Simulator command with wrong parameter")
 {
     string commFile = " 2>&1";
@@ -124,18 +128,38 @@ TEST_CASE("test the Sonar Simulator command with wrong parameter")
     REQUIRE(ss.str()=="Usage: simulate-sonar outputFileName\n");
 }
 
-TEST_CASE("test the checksum calculation")
+/**test the calculation of the checksum*/
+/*TEST_CASE("test the checksum calculation")
 {
     std::string line = "$GPGGA,151748.00,4645.5364455,N,07255.2973044,W,2,14,0.8,278.587,M,-31.492,M,5.0,0133*";
     SonarSimulator *simulator;
     std::string filename = "test";
     simulator = new SonarSimulator(1,1,filename);
-    int checksum = simulator->calculChecksum(line);
+    int checksum = simulator->calculDBTChecksum(line);
     std::stringstream ss;
     ss<<std::hex<<checksum;
     REQUIRE(ss.str() == "7a");
+}*/
+
+TEST_CASE("test the checksum with invalid line")
+{
+    std::string line = "$GPGGA,151748.00,4645.5364455,N,07255.2973044,W,2,14,0.8,278.587,M,-31.492,M,5.0,0133*";
+    SonarSimulator *simulator;
+    std::string filename = "test";
+    std::string msgError = "";
+    simulator = new SonarSimulator(1,1,filename);
+    try
+    {
+        simulator->calculDBTChecksum(line);
+    }
+    catch(Exception * e)
+    {
+        msgError = e->getMessage();
+    }
+    REQUIRE(msgError == "Invalid parameter: Bad NMEA line");
 }
 
+/**test the generating of the NMEA line*/
 TEST_CASE("test the Sonar Simulator NMEA line")
 {
     SonarSimulator *simulator;
@@ -157,6 +181,7 @@ TEST_CASE("test the Sonar Simulator NMEA line")
     REQUIRE(std::string(checksum)=="2f");
 }
 
+/**test the writing of the NMEA line on the output file*/
 TEST_CASE("test the writing on the outputFile")
 {
     SonarSimulator *simulator;
@@ -177,6 +202,7 @@ TEST_CASE("test the writing on the outputFile")
     REQUIRE(sscanf(row.c_str(),"$%2sDBT,%lf,f,%lf,M,%lf,F*%2s\x0d\x0a",ID,&depthFeet,&depthMeter,&depthFathoms,checksum)==5);
 }
 
+/**test if the frequence is respected during the writing*/
 TEST_CASE("test the frequence")
 {
     SonarSimulator *simulator;
